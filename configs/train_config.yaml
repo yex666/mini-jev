@@ -1,0 +1,50 @@
+# MiniJEV 训练配置
+
+model:
+  base_model: "Qwen/Qwen3-0.6B"
+  trust_remote_code: true
+  torch_dtype: "float16"
+
+lora:
+  r: 8                    # LoRA 秩
+  lora_alpha: 32          # 缩放因子
+  target_modules: ["q_proj", "v_proj", "k_proj", "o_proj"]
+  lora_dropout: 0.1
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+training:
+  output_dir: "./outputs/models"
+  num_train_epochs: 3
+  per_device_train_batch_size: 4
+  per_device_eval_batch_size: 4
+  gradient_accumulation_steps: 4
+  learning_rate: 2.0e-4
+  weight_decay: 0.01
+  warmup_ratio: 0.1
+  lr_scheduler_type: "cosine"
+  max_seq_length: 512
+
+  # 保存与评估
+  save_strategy: "steps"
+  save_steps: 100
+  save_total_limit: 3
+  eval_strategy: "steps"
+  eval_steps: 100
+
+  # 日志
+  logging_dir: "./outputs/logs"
+  logging_steps: 10
+  report_to: "tensorboard"
+
+  # 优化
+  fp16: true
+  optim: "adamw_torch"
+  max_grad_norm: 1.0
+  seed: 42
+
+data:
+  train_file: "./data/processed/train.jsonl"
+  eval_file: "./data/processed/val.jsonl"
+  test_file: "./data/processed/test.jsonl"
+  max_samples: null  # null 表示使用全部数据
